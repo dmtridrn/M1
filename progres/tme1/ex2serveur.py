@@ -7,6 +7,7 @@ def handle_client(sock):
         sock.recv(2048)
         modifiedMessage = str(time.time()).encode('utf-8')
         sock.send(modifiedMessage)
+        print('réponse envoyée')
 
 serverPort = 1234
 serverSocket = socket(AF_INET,SOCK_STREAM)
