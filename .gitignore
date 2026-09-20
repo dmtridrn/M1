@@ -1,0 +1,4 @@
+
+# macOS Debug Symbol Packages
+*.dSYM/
+.DS_Store
