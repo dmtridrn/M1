@@ -58,3 +58,24 @@ char* newcopy(const char* c){
 }
 
 (7)
+using namespace std
+int main(){
+    const char* mot = "Hello World";
+    char* copie = newcopy(mot);
+    cout << mot << "-" << copie << endl;
+    cout << (void*)mot << "-" << (void*)copie << endl;
+    cout << length(mot) << "-" << length(copie) << endl;
+    delete[] copie;
+}
+
+litteral dans rodata
+copie dans le tas
+variables dans la pile
+
+(8)
+g++ -c strutil.cpp -o strutil.o -std=c++20 -g -O0
+g++ -c exo1.cpp -o exo1.o -std=c++20 -g -O0
+g++ strutil.o exo1.o -o exo1
+
+(9)
+
