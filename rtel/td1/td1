@@ -1,0 +1,60 @@
+EXERCICE 1
+
+1) (1/2)^32
+2) 2^8
+3) 86/112 = 77%
+4) plus le nombre de couche augmente, plus le débit utile est réduit
+5) numéro fragment, taille fragment, numéro message, nombre de fragments
+6) 86 octets - 4 = 82 => 12 fragments de 82 + 1 fragment de 16 octets
+   1000/(112*13) = 68,7%
+
+
+EXERCICE 2
+
+3) @MAC dest = a0 39 ee 8b fa 24
+   @MAC src = f0 18 98 56 37 47
+   Type = (08 00) = IPV4
+
+4) 
+@IP src = (c0 a8 00 16) = 192.168.0.22
+@IP dest = (22 6b 18 52) = 34.107.221.82
+protocol ID = 06 = TCP
+longueur paquet = 00 34 = 52 octets
+
+5) 
+# port src = c0 a8 = 49320
+# port dest = 00 50 = 80
+# sq = 70 33 91 c8 = 1882427848
+# ack = 6d ad 7c dd = 1840086237
+taille entête = 8 = 32 octets
+transporte une charge utile ? Non
+flags: (11)b16 et on prends les 6 derniers bits = (0001 0001)b2 = 01 0001
+Type du segment: ACK-FIN
+
+
+EXERCICE 3
+
+1) 12 symboles
+2) 111001001011
+3) 1.2 micro secondes pour 12 symboles = 0.1 microseconde par bit 
+    débit = 10Mb/secondes
+4) 10Mb/s 
+taille de la trame = 66 octets
+temps = (66*8)/10M = 52.8 microseconde
+
+
+EXERCICE 4
+
+1) 6 symboles
+2) 111101000010
+3) 0.924 ms pour 6 symboles => Ts =  0.924ms/6 = 0.154ms/symboles
+                               R = 1/Ts = 1/0.154 = 6.49 Ksymboles/s
+                                                  = 12.98Kb/s 
+5) 
+
+
+EXERCICE 5
+
+1) Ttrame = M/D = (500*8)/100*10^6 = 40 microseconde
+2) 200000km/s on a 1km = 5microseconde
+3)
