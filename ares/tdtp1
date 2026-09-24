@@ -1,0 +1,24 @@
+2) Destination: 00:50:7f:05:40
+   Source: 00:10:a4:86:2d:0b
+   Type: 0x0800
+
+3) Version 4
+    THL: 5 => taille de l'entête 20 octet
+    TOS: 0x00
+    Longueur: 537 octets
+    Id: 0x 1798
+    Fl: ne pas fragmenter
+    Fo: 0
+    TTL: 40
+    protocol: 06: tcp
+    header checksum: 0x6c14
+    ipsrc: 10.33.182.178
+    ipdest: 192.55.52.40
+
+4)
+    port source: 33971
+    port dest: 80
+    THL: 32 octets
+    Flags: ACK PSH
+    somme de controle
+
