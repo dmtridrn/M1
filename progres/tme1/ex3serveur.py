@@ -43,7 +43,11 @@ while True:
                 sockets[clientSocket.fileno()] = clientSocket
                 my_poll.register(clientSocket,POLLIN)
             else: #client
-                data = sockets[fd].recv(4096)
+                try:
+                    data = sockets[fd].recv(4096)
+                except (BlockingIOError, ConnectionResetError):
+                        clean_socket(fd)
+                        continue
                 if not data:
                     clean_socket(fd)
                     continue
@@ -83,7 +87,11 @@ while True:
         elif event & POLLOUT: #si ya qqch a envoyer
             if fd in to_send:
                 data = to_send[fd]
-                n = sockets[fd].send(data)
+                try:
+                    n = sockets[fd].send(data)
+                except (BlockingIOError, ConnectionResetError, BrokenPipeError):
+                    clean_socket(fd)
+                    continue
                 if n < len(data): #si on envoie pas tout
                     to_send[fd] = data[n:] #pas grave on stock ce qui reste à envoyer
                 else: #tout est OKKKKK

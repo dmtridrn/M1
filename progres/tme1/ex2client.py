@@ -7,10 +7,10 @@ clientSocket.connect((serverName,serverPort))
 
 
 message = 'a'.encode('utf-8')
-while True:
+while True: #on envoie jusqu'à la mort
     time.sleep(1)
     clientSocket.send(message)
     modifiedMessage = float(clientSocket.recv(2048).decode('utf-8'))
     temps = time.time()
 
-    print(f"temps local: {temps}/ temps distant: {modifiedMessage}/ décalage {abs(temps-modifiedMessage)}")
+    print(f"temps local: {temps}/ temps distant: {modifiedMessage}/ décalage {abs(temps-modifiedMessage)}") #on calcule juste le décalage
