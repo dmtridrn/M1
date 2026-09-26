@@ -89,5 +89,5 @@ while True:
                 else: #tout est OKKKKK
                     clean_socket(fd)
 
-# testé avec apache benchmark en vif (simule 10 clients qui font 10 requêtes chacun en simultané)
-# ab -n 100 -c 10 http://127.0.0.1:1234/index.html
+# testé avec apache benchmark en vif (simule 100 clients qui font 10 requêtes chacun en simultané)
+# ab -n 1000 -c 100 http://127.0.0.1:1234/index.html
