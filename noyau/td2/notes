@@ -1,0 +1,4 @@
+proc[NPROC]: tableau des structures proc de tous les processus //infos qui servent tout le temps
+u: contient la structure user du processus courant //infos qui servent uniquement quand je m'exécute
+struct proc* p = u.u_procp pour récup l adresse de la struct proc du procesus courant
+

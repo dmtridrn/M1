@@ -1,0 +1,43 @@
+//code qui wakeup à chaque changement de temp
+
+int temp; 
+wait_cold(int deg){
+    old = gpl() //priority level de l'appelant
+    spl(CLINHB)//atomique à partir de la (masque toutes les interruptions système)
+    while(temp > deg){
+        sleep(&temp, PRIBIO);
+    }
+    spl(old) //on remet l'ancien pl
+}
+
+update_temp(int new){
+    temp = new;
+    wakeup(&temp)
+}
+
+//code qui wakeup que si qqn attend
+struct temp{
+    int deg;
+    int wait_cold;
+}
+
+wait_cold(int deg){
+    old = gpl() //priority level de l'appelant
+    spl(CLINHB)//atomique à partir de la (masque toutes les interruptions système)
+    while(temp.deg > deg){
+        temp.wait_cold++;
+        sleep(&temp, PSLEEP);
+    }
+    spl(old) //on remet l'ancien pl
+}
+
+update_temp(int new){
+    old = gpl()
+    spl(CLINHB)//atomique 
+    temp.deg = new;
+    if(temp.wait_cold){
+        wakeup(&temp);
+        temp.wait_cold = 0;
+    }
+    spl(old)
+}
