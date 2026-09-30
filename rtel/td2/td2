@@ -1,0 +1,159 @@
+EXERCICE 1
+
+1)
+Fmax = 4kHz
+Fe = 2*Fmax = 8kHz
+
+2)
+1/8000 = 125 miscorsec
+
+3)
+2^8 = 256 => 8bits/echantillon
+
+4)
+8000 échantillons/s * 8bits/échantillon = 64000 bits = 64kb/s
+
+5)
+oui
+2 ordinateurs avec modems
+Les paquets IP sont envoyés sur une ligne téléphonique à débit constant de 64kb/s
+
+6)
+photo 30sept 9:45
+
+7)
+pareil
+Ttransfzrt = 5*Tprop + 5*Treq + 4*Tproc + Tres + L/D + Tack
+
+L/D = Tdata
+
+EXERCICE 2
+voir photos
+
+1)
+chaque paquet doit être reçu avant d'en envoyer un 
+2)
+pareil mais vu que yen a 2 quand on reçoit le 2eme on peut déjà envoyer le premier
+3) pareil
+4) pareil 
+5) diviser un gros volume de données en petits paquets peut réduire le temps 
+de transfert, cependant si trop de fragmentation la taille du paquet devient trop 
+petite par rapport à la taille de l'entête, la multiplication de la taille du header
+cause une augmentation du temps de transfert
+
+EXERCICE 3
+
+1)
+voir photo
+2)
+oui, quand la topologie du réseau change, le routage change
+3)
+oui, si le chemin du paquet P2 passe par les routeurs moins chargés que celui de P1
+4)
+L'adresse de destination
+5)Non car l'@ dest est dans l'entête de chaque paquet 
+6) @ destination et interface de sortie
+7)
++----------+----------+
+| @dest.   | interface|
+|---------------------|
+|     A    |      1   |
+|---------------------|
+|     B    |      2   |
++---------------------+
+
+8)
+2^13 < 10000 < 2^14.  -> au moins 14 bits
+
+9)
+Chaque interface de sortie est associée à leur file d'attente, quand des paquets 
+venant de plusieurs interfaces d'entrée veulent emprunter la même interface de sortie -> la taille de
+la file d'attente augmente _> le nœud est congestionné
+conqéquences: augmentation du délai et perte de paquets
+
+
+EXERCICE 4
+1) voir photo pour schéma pas complet
+T = {5*Treq + 5*Tprog + 4*Tc} (ça c'est la request de co)
+   +{5*Tres + 5*Tprog + 4*Tc} (ça c'est la réponse qui dit ok)
+   +{7*((H+(L/3))/D) + 5*Tprog + 4*Tc} (envoi des paquets)
+   +{5*Tack + 5*Tprog + 4*Tc} (acknowledge)
+  = 20*Tprog + 16*Tc + 7*((H+(L/3))/D) + 5*Treq + 5*Tres + 5*Tack
+
+2)
+le routage est fait une seule fois au début lors de l'établissement du circuit virtuel
+et ne change pas durant la durée de vie du circuit virtuel
+
+
+3)
+Non pcq les paquets sont envoyés sur le même circuit
+
+4)
+La phase de signalisation = établissement du circuit virtuel
+    - Les messages de Request contiennent @ du destinataire (pour faire le routage)
+    - Chaque nœud intermédiaire fait le routage et attribue un label qui est un numéro local
+      unique pour identifier le circuit virtuel sur la liaison entre 2 nœuds consécutifs
+    - Insérer/créer une ligne dans la table de commutation qui sera prêt à recevoir 
+      et communiquer des paquets de données utilisateur
+
+5)
+
+- Table de routage: 
+    - pour établir le chemin du circuit virtuel durant la signalisation
+    - basé sur l'adresse de destination pour faire le routage
+- Table de commutation:
+    - pour commuter des données utilisateur
+    - basé sur les labels attribués durant la signalisation
+
+6) 
+Durant l'établissement du ciruit virtuel
+7)
+Durant le transfert de données utilisateur
+8) Ça dépend:
+    - Si le réseau a beaucoup de nœuds mais pas beaucoup de circuits virtuels en cours, 
+      la table de routage est plus grande
+    - Si le réseau est petit (peu de nœuds) mais que beaucoup de commutations simultanées entre les 
+      nœuds (beaucoup de circuits virtuels établis entre les nœuds) la table de commutation est la 
+      plus grande
+
+9) 
+Le label: - a une valeur locale sur une liaison entre deux nœuds consécutifs
+          - pour identifier d'une manière unique les circuits virtuels passant par une liaison entre
+            2 nœuds consécutifs
+L'adresse: - a une valeur globale sur tout le réseau
+           - pour identifier d'une manière unique un nœud dans le réseau
+
+10)
+14 bits pour encoder le label
+11)
++-----------------------+
+| @ dest   | inf sortie |
++-----------------------+
+|    A     |      1     |
++-----------------------+
+|    B     |      2     |
++-----------------------+
+
+12)
++---------------------------------------------------------------+
+|Inf d'entrée | Label d'entrée | Inf de sortie | Label de sortie|
++---------------------------------------------------------------+
+|       1     |       15       |       2       |      33        |
++---------------------------------------------------------------+
+
+EXERCICE 5
+
+1) Virtualisation des réseaux = rendre les fonctions réseaux (routage, firewall...)
+   virtuelles -> plus facile à instancier dans les équipements génériques
+
+2) + flexible mais - performant
+
+3) 
+virtualisation: basées sur les VM pour partager les ressources physique entre différents OS
+conteneurisation: basée sur les conteneurs pour faciliter le déploiement logiciel rapid
+
+4)
+Cloud: gros datacenters centralisés
+Edge: plus petit datacenter, proche du client
+
+5) Permettre d'héberger et exécuter les fonctions réseau en fonction des demandes de QoS du client
