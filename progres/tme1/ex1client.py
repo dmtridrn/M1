@@ -1,6 +1,6 @@
 from socket import *
 import time
-serverName ='10.51.22.74'
+serverName ='127.0.0.1'
 serverPort = 1234
 clientSocket = socket(AF_INET,SOCK_DGRAM)
 message = 'ping'.encode('utf-8')

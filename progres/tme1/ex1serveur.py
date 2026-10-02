@@ -6,7 +6,7 @@ serverSocket.bind(('',serverPort))
 print('server ready')
 while True:
     message, clientAddress = serverSocket.recvfrom(2048)
-    if random.randint(1, 10) <= 5:  #50% de chance d'ignorer
+    if random.randint(1, 2) == 1:  #50% de chance d'ignorer
         continue
     print(message.decode('utf-8'))
     modifiedMessage = message.upper() #on envoie n'importe la juste on répète en criant

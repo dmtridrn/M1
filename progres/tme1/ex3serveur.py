@@ -1,4 +1,4 @@
-# j'ai utilisé poll même si loin d'être nécessaire j'aime bien
+# j'ai utilisé poll 
 
 from socket import *
 from select import *
@@ -83,7 +83,7 @@ while True:
                             "\r\n"
                         ).encode('utf-8')
                         to_send[fd] = entete + contenu
-                        my_poll.modify(fd, POLLOUT)
+                        my_poll.modify(fd, POLLOUT) #que POLLOUT car on ferme la connection après l'envoi, pas besoin de garder pollin
         elif event & POLLOUT: #si ya qqch a envoyer
             if fd in to_send:
                 data = to_send[fd]
