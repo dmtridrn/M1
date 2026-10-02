@@ -1,5 +1,3 @@
-# j'ai utilisé poll 
-
 from socket import *
 from select import *
 from pathlib import Path
@@ -45,7 +43,7 @@ while True:
             else: #client
                 try:
                     data = sockets[fd].recv(4096)
-                except (BlockingIOError, ConnectionResetError):
+                except (OSError):
                         clean_socket(fd)
                         continue
                 if not data:

@@ -3,7 +3,7 @@ import time
 from threading import *
 
 def handle_client(sock):
-    try: #au cas ouuuuuu mais trql
+    try:
         while True:
             n = sock.recv(2048)
             if not n:
@@ -13,7 +13,7 @@ def handle_client(sock):
             print('réponse envoyée')
     except (OSError):
         print("client est parti")
-    finally:
+    finally: #quand le client n'envoie plus rien (ça ne lève pas d'erreur donc finally obligé)
         sock.close()
 
 serverPort = 1234

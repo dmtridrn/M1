@@ -35,6 +35,8 @@ Quand poll détecte un évènement, il renvoie un tuple (fd,event); il est possi
 
 J'ai aussi décidé de créer un fichier par défaut `index.html` au cas où le client ne fais pas de demande de fichier explicite dans sa reqête HTML (comme on accèderai à une page d'accueil d'un site sans fichier après l'url).
 
+J'ai écris une fonction utilitaire `clean_socket()` pour recycler le code répétitif (le deuxième argument None des fonctions pop est là pour ne pas lever d'erreur KeyError)
+
 Pour tester plusieurs clients faisant plusieurs requête en simultané, jai utilisé apache benchmark pour simuler un scénario pouvant mettre mon serveur à l'épreuve (100 clients et 1000 requêtes en tout):  
 ```bash
 ab -n 1000 -c 100 http://127.0.0.1:1234/index.html
