@@ -5,10 +5,10 @@
 Pour cet exercice, le serveur est très simple: il reçoit un message et répond à la même addresse dans une boucle infinie.
 Le client envoie un message au serveur et attend sa réponse pour mesurer le temps entre l'envoi et la réception.
 Avec une probabilité que le serveur ne réponde pas à la moitié des messages, j'ai mis un timeout (`clientSocket.settimeout(1.0)`) sur la socket côté client pour ne pas rester bloqué sur le recvfrom en plus d'un compteur des réponses. Ainsi, la moyenne calculée est celle de l'attente de réponse des paquets efectivement reçus.
-Pas besoin de Thread ni Poll pour gérer plusieurs clients: udp n'impose pas de connection avec le serveur, il peut donc répondre à n'importe quelle addresse qui lui a envoyé un message.
 ```python
 print(f"moyenne : {totaltemps / totalreponses} s ({totalreponses}/10 reçus)")
 ```
+Pas besoin de Thread ni Poll pour gérer plusieurs clients: udp n'impose pas de connection avec le serveur, il peut donc répondre à n'importe quelle addresse qui lui a envoyé un message.
 
 ## Exercice 2
 
@@ -17,7 +17,8 @@ J'ai donc décidé d'implémenter un serveur multithread capable de palier à ce
 Le serveur accepte des nouveaux clients dans une boucle infinie et crée une socket pour leur comminication, il lance ensuite un Thread avec ce socket en argument (`Thread(target=handle_client,args=(connectionSocket,)).start()`). Ce Thread va en boucle:
 - recevoir le message du client
 - lui envoyer son heure locale
-- fermer la connection (si le client coupe la communication)
+- fermer la connection (si le client coupe la communication)  
+
 Le client ne fait rien de spécial, il envoie un message au serveur, reçoit une réponse et compare son heure locale avec celle du serveur
 
 ## Exercice 3
