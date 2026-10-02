@@ -11,7 +11,7 @@ def handle_client(sock):
             modifiedMessage = str(time.time()).encode('utf-8')
             sock.send(modifiedMessage)
             print('réponse envoyée')
-    except (ConnectionResetError, BrokenPipeError):
+    except (OSError):
         print("client est parti")
     finally:
         sock.close()
@@ -19,7 +19,7 @@ def handle_client(sock):
 serverPort = 1234
 serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.bind(('',serverPort))
-serverSocket.listen(1)
+serverSocket.listen(47)
 print('server ready')
 
 while True:

@@ -9,7 +9,7 @@ serverPort = 1234
 serverSocket = socket(AF_INET,SOCK_STREAM)
 serverSocket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1) #pour address already in use 
 serverSocket.bind(('',serverPort))
-serverSocket.listen(67)
+serverSocket.listen(47)
 serverSocket.setblocking(False) #si recv bloque ca paralyse pas tout
 
 #setup de poll et écoute sur la socket serv
@@ -89,7 +89,7 @@ while True:
                 data = to_send[fd]
                 try:
                     n = sockets[fd].send(data)
-                except (BlockingIOError, ConnectionResetError, BrokenPipeError):
+                except (OSError):
                     clean_socket(fd)
                     continue
                 if n < len(data): #si on envoie pas tout

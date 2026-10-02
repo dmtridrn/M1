@@ -6,7 +6,7 @@ clientSocket = socket(AF_INET,SOCK_STREAM)
 clientSocket.connect((serverName,serverPort))
 
 
-message = 'a'.encode('utf-8')
+message = 'slt'.encode('utf-8')
 while True: #on envoie jusqu'à la mort
     time.sleep(1)
     clientSocket.send(message)
