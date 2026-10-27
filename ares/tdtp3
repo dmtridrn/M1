@@ -1,0 +1,118 @@
+1.4.2:
+Evolution
+
+1) port 25 en TCP
+2) EHLO, MAIL FROM, RCPT TO, DATA, QUIT
+3)
+250-server
+250-PIPELINING
+250-SIZE 10240000
+250-VRFY
+250-ETRN
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-8BITMIME
+250-DSN
+250-SMTPUTF8
+250 CHUNKING
+4) oui, après data
+5)
+Subject: BONJOUR
+From: etudiant <etudiant@ares.test>
+To: etudiant@ares.test
+Date: Fri, 23 Oct 2026 10:42:26 +0000
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+User-Agent: Evolution 3.56.2-0+deb13u1 
+MIME-Version: 1.0
+6) en clair, pas confidentiel
+
+TELNET
+
+1) 250 2.0.0 Ok: queued as 6C8CB24056
+2) a part les données additionnelles telles que la date ou le type de contenu, non
+3) Non, le port 25 est réservé SMTP, quand on telnet sur 25 le protocole engagé est SMTP
+4) Aucune vérif, je peux mettre ce que je veux
+
+WEBMAIL
+
+1) ça marche pas
+errors: <91a84cfc> PHP Error: SMTP server does not support authentication in /var/www/html/program/lib/Roundcube/bootstrap.php on line 101 (POST /?_task=mail&_unlock=loading1792763392395&_framed=1&_lang=en&_action=send)
+errors: <91a84cfc> SMTP Error: Authentication failure: server
+
+1.5.2
+
+POP3 
+
+1) TCP, port 110
+2) 
+CAPA
+USER et PASS
+LIST
+UIDL
+RETR 1 et 2
+DELE 1 et 2
+QUIT
+3) oui, pas sécurisé
+4) oui
+
+POP3 DIRECT
+1) 
+STAT
++OK 1 606 //ya un message
+LIST
++OK 1 messages:
+1 606 //numéro 1
+
+2)
+RETR 1
++OK 606 octets
+Return-Path: <etudiant@ares.test>
+X-Original-To: etudiant@ares.test
+Delivered-To: etudiant@ares.test
+Received: from [172.22.0.2] (client.ares-mail-net [172.22.0.2])
+	by server (Postfix) with ESMTP id B566C24109
+	for <etudiant@ares.test>; Fri, 23 Oct 2026 14:35:15 +0000 (UTC)
+Message-ID: <b3c0718ee431bc1f6a647b0170d5542a12706787.camel@ares.test>
+Subject: TEST hahaha
+From: etudiant <etudiant@ares.test>
+To: etudiant@ares.test
+Date: Fri, 23 Oct 2026 14:35:15 +0000
+Content-Type: text/plain
+Content-Transfer-Encoding: 7bit
+User-Agent: Evolution 3.56.2-0+deb13u1 
+MIME-Version: 1.0
+
+BONJOUR
+.
+
+3) C'est tout pareil
+
+IMAP
+
+1) A00000 puis A00001 puis A00002...
+2) LIST, SELECT INBOX, UID FETCH...
+3) 
+avec tag: OK (idle, noop, fetch...)
+sans tag: LIST, STATUS, +idling...
+4) Oui on peut tout voir comme pop3, ya juste plus de protocole
+5) beaucoup plus de checks, de requêtes, du idling...
+
+1)
+2)* FLAGS (\Answered \Flagged \Deleted \Seen \Draft)
+* OK [PERMANENTFLAGS (\Answered \Flagged \Deleted \Seen \Draft \*)] Flags permitted.
+* 2 EXISTS
+* 0 RECENT
+* OK [UNSEEN 2] First unseen.
+* OK [UIDVALIDITY 1792762934] UIDs valid
+* OK [UIDNEXT 6] Predicted next UID
+* OK [HIGHESTMODSEQ 9] Highest
+a3 OK [READ-WRITE] Select completed (0.002 + 0.000 + 0.001 secs).
+3) tout en clair
+
+WEBMAIL RECPT
+
+1) 172.22.0.2 (client, firefox) et 172.22.0.5 (webmail, roundcube)
+2) non, que des requêtes http
+3) 172.22.0.5 (webmail, roundcube) et 172.22.0.3 (server, dovecot, postfix)
+4) 

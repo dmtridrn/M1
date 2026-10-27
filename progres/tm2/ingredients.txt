@@ -1,0 +1,9 @@
+Proteins: chicken, beef, pork, tofu, shrimp, salmon, eggs, bacon, sausage, turkey, lamb
+Vegetables: carrot, potato, onion, garlic, tomato, bell pepper, broccoli, spinach, mushroom, zucchini, cucumber, lettuce, kale, cauliflower, asparagus, green beans, peas, corn, eggplant
+Fruits: apple, banana, orange, lemon, lime, strawberry, blueberry, raspberry, mango, pineapple, avocado, peach, cherry, grape
+Dairy: cheese, milk, butter, yogurt, cream, sour cream, cottage cheese, cream cheese
+Grains and Legumes: rice, quinoa, pasta, bread, oats, barley, lentils, chickpeas, black beans, kidney beans
+Herbs and Spices: basil, oregano, thyme, rosemary, parsley, cilantro, dill, mint, sage, bay leaves, paprika, cayenne, cumin, coriander, turmeric, cinnamon, nutmeg, black pepper, salt
+Oils and Vinegars: olive oil, vegetable oil, canola oil, sesame oil, coconut oil, balsamic vinegar, apple cider vinegar, red wine vinegar, white wine vinegar, rice vinegar
+Condiments and Sauces: soy sauce, ketchup, mustard, mayonnaise, hot sauce, barbecue sauce, Worcestershire sauce, honey, maple syrup
+Baking Ingredients: flour, sugar, brown sugar, baking powder, baking soda, yeast, cocoa powder, vanilla extract, chocolate chips, nuts, dried fruits

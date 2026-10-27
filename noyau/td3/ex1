@@ -1,0 +1,15 @@
+#include <signal.h>
+
+void bonjour(){
+    printf("bonjour")
+    alarm(1);
+    signal(SIGALRM, bonjour);
+}
+
+int main(){
+    alarm(1)
+    signal(SIGALRM, bonjour);
+    while 1{
+        pause()
+    }
+}
