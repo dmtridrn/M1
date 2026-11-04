@@ -1,6 +1,52 @@
 Exercice 1:
 
 (1) CSMA/CD: carrier sense multiple access / collision detection
-
     - Avant d'émettre une trame, il faut écouter le support.
-    - 
+    - . Si le support est libre -> envoyer la trame
+      . Si le support est occupé -> attendre que le support soit libre pour envoyer la trame
+Durant la transmission de la trame, continuer d'écouter le support pour détecter les collisions.
+    - si aucune collision est détectée -> la trame est envoyée avec succès
+    - en cas de collisionn: arrêter la transmission, envoyer jam seq, appliquer l'algo de Baekoff pour calculer le temps d'attente avant de relancer la transmission
+
+Algo de bakeoff: 
+Timeslot: ∆t = 512 * Tbit
+Tbakeoff = r * ∆t avec:
+    - r ∈ [0, 2^k[
+    - k = min(n,10)
+    - n <= 16 qui est le nombre de collisions consécutives pour la même trame
+-> D = 10 Mbit/s
+   Tbit = 1/D = 1/10*10^6 = O.1 micros
+-> ∆t = 51,2 micro s
+
+n = 1
+k = min(10,1) = 1
+r ∈ [0, 2^1[ = [0, 1]
+
+Exercice 2:
+Lmax =   Mmin/D   *   V/2
+Lmax = (64*8)/(10*10^6) * (2*10^8)/2  = 5120 mètres
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+]]]]

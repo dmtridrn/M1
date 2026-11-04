@@ -170,3 +170,23 @@ STLS
 2) non
 
 
+DNS
+
+2.3.2
+
+resolv.conf sert à indiquer à la machine quelle est l'addresse du serveur DNS qu'elle doit interroger
+named.conf, gère les zones ares.test et 0.22.172.inaddr-arpa: nom -> ip et ip->nom
+recursion:yes indique que le serveur peut chercher la réponse finale à la place du client en interrogeant lui même
+               les serveurs racines
+db.ares.test: SOA (start of authority) -> indique le serveur dns et l'addresse de l'admin
+              NS (name server) -> indique le serveur DNS qui fait autorité ici
+              A (addresse) -> associe un nom à une addresse
+
+dig @172 .22.0.3 client . ares . test A
+.2 est retournée
+aa -> flag qui indique que le serveur interrogé fait autorité: c'est le job de CE serveur de donner CETTE réponse
+
+
+Analyse échanges DNS
+1) UDP, port 53
+2) 
