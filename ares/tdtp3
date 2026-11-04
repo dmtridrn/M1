@@ -115,4 +115,58 @@ WEBMAIL RECPT
 1) 172.22.0.2 (client, firefox) et 172.22.0.5 (webmail, roundcube)
 2) non, que des requêtes http
 3) 172.22.0.5 (webmail, roundcube) et 172.22.0.3 (server, dovecot, postfix)
-4) 
+C'est donc roundcube qui fais office de client imap vers le server
+4) 0.2 (client firefox) requetes http a 0.5 (webmail)
+   échanges imap entre 03 et 05, 05 demande la liste des mails
+   05 dit FOUND a 02 en http
+   02 refait un get 
+   05 va chercher en imap le mail correspondant a 03
+   02 récupère le mail
+5) non, il utilise que imap
+6) c'était aussi 02 qui servait de client, pas depuis firefox mais depuis Evolution
+7) tout est en clair, le contenu du mail, le mdp/login...
+
+
+1.6.1
+STARTTLS manuel
+
+1) Oui: 220 server ESMTP ARES
+
+EHLO mail.example.com
+
+250-server
+250-PIPELINING
+250-SIZE 10240000
+250-VRFY
+250-ETRN
+250-STARTTLS
+250-ENHANCEDSTATUSCODES
+250-8BITMIME
+250-DSN
+250-SMTPUTF8
+250 CHUNKING
+
+STARTTLS
+
+220 2.0.0 Ready to start TLS
+
+2) 
+3) Non, TLS v1.3
+4) Non
+5) Il encapsule les données smtp et les chiffre
+
+POP3 TLS EXPLICITE
+1) non, attend un paquet de confirmation
++OK Dovecot ready.
+
+STLS
+
++OK Begin TLS negotiation now.
+
+2) 
+3) bah c chiffré
+
+1) non
+2) non
+
+
