@@ -1,0 +1,18 @@
+2) signal ignoré: reçu mais non traité
+   signal masqué: reçu mais traitement plus tard
+3) 
+
+//proc.h
+struct proc {
+  ...
+  int p_sig ;//signaux reçus sous fomre de flags
+  ...
+} proc[NPROC]
+
+//user.h
+struct user {
+  ...
+  u_signal[NSIG] //tableau pointeur de fonction : addr des handlers
+  ...
+} u;
+
