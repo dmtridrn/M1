@@ -1,0 +1,21 @@
+//squelette appel systeme
+sys_xxx ()
+{
+    // recup les param
+    int param_a = u.u_arg[0];
+    int param_b = u.u_arg[1];
+    ....
+
+    // retour erreur
+    if ( param_a == 0 ) {
+        u.u_error = EINVAL ;
+        return ;
+    }
+
+    /*
+    code
+    */
+    
+    // retour val
+    u.u_ar0[R0] = val ;  // <=> return val du monde S -> monde U
+}

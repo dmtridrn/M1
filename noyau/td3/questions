@@ -16,3 +16,9 @@ struct user {
   ...
 } u;
 
+6)
+       MODE U   |     MODE S
+       libc     |     kernel
+ ----------------------------------
+ kill(pid,sig) ---> kill (<=>sys_kill) ---> psignal(fonction interne du noyau)
+signal(pid,@f) ---> ssig() 
