@@ -189,4 +189,147 @@ aa -> flag qui indique que le serveur interrogé fait autorité: c'est le job de
 
 Analyse échanges DNS
 1) UDP, port 53
+2) Il y a un transaction ID juste avant les flags et juste après la trame UDP
+3) C'est une requête. Le flag est 0x0120, le 8eme bit (RD) est a 1 donc ca va faire récursif
+4) Indicateur AA (authoritative answer)
+5) Le nom demandé est dans Queries et Answers, l'ipv4 est dans Answers
+6) 2.0.22.172.in-addr.arpa type PTR
+7) non, même chose, juste le format qui change (demande de PTR au lieu de A)
+
+2.4.1
+
+1) le serveur qui fait référence pour la racine est .root
+   on a .test IN NS dns.test. qui veut dire que pour aller chercher le .test faut parler au dns.test
+   on a dns.test IN A 172.22.0.11 qui veut dire que pour parler a dns.test. il faut llaer a cette ip
+2) ares    IN  NS  dns.ares.test.
+3) dns.ares.test. qui retourne 172.22.0.20
+
+Analyse récursion et itération
+
+1) source: 172.22.0.2 (client)
+   dest : .0.3 (dns-local)
+Oui RD est à 1 
+
+2) Non car c'est à lui de chercher dcp, aussi on peut pas demander RD au root
+3) root renvoie le nameserver dns.test sur l'addresse 11.
+4) ensuite on interroge dns.test pour trouver ares.test, 
+   il renvoie ns ares.test sur l'addresse 12
+5) la réponse est différente car c'est lui qui possède le fichier donnant sur www. 
+   Il fait donc autorité.
+6) le client a visité un seul serveur, la réponse envoyé au client par dns-local est   
+   exactement la même que celle reçue de dns.ares.test
+7) On reçoit dns.ares.test, on sait que dns.ares.test est dans la branche de ares.test
+   On va donc redemander a ares.test
+8) Il veut obtenir l'addresse IPV6 de www.ares.test
+
+
+2.4.2
+
+1) l'adresse 30 est retournée, il a fallu changer que le serveur autorité
+   car c'est lui qui détenait l'information
+
+Ajout d'un nouveau nom DNS
+
+1) Non, encore une fois, c'est ares.test qui a le fichier seul lui a besoin de le modifier.
 2) 
+
+Impact du cache
+
+1) non, le cache permet de stocker la réponse
+2) le TTL s'écoule entre les 2 réponse, ce qui veut dire que 
+   c'est la même réponse envoyée 2 fois
+
+2.6
+
+1) nameserver 192.168.1.254
+nameserver fd0f:ee:b0::1
+le isp te la donner
+2) non, c'est un suffixe qui se rattache à la recherche
+
+Interrogation du resolveur dns
+
+1) question: on demande l'addresse ipv4 de www.debian.org (
+   ;; QUESTION SECTION:
+   ;www.debian.org.			IN	A)
+
+réponse: ;; ANSWER SECTION:
+www.debian.org.		113	IN	A	194.177.211.216
+www.debian.org.		113	IN	A	130.89.148.77
+
+2) rd (récursion demandée) et ra (récursion disponible) sont présents, aa (réponse autorité) ne l'est pas 
+3) CNAME est un alias qui redirige vers un autre nom de domaine
+
+
+Capture public
+
+1) src: 192.168.1.33
+   dst: .1.254
+C'est plus des addresses locales
+2) UDP port 53
+3) Non car le résolveur DNS ne fait pas partie de mon sous réseau, je ne peux donc
+   pas voir toutes les requêtes qu'il fait.
+
+Comparaison avec la hiérarchie DNS expérimentale
+
+1) meme fonction pas au même endroit, l'un est en local l'autre sur internet, l'un 
+   est observable l'autre moins.
+2) mm réponse que la 3 précédente
+
+Utilisation optionnelle de dig +trace
+
+ dig -4 @1.1.1.1 +trace www.debian.org
+
+; <<>> DiG 9.20.26-1~deb13u1-Debian <<>> -4 @1.1.1.1 +trace www.debian.org
+; (1 server found)
+;; global options: +cmd
+.			509158	IN	NS	a.root-servers.net.
+.			509158	IN	NS	b.root-servers.net.
+.			509158	IN	NS	c.root-servers.net.
+.			509158	IN	NS	d.root-servers.net.
+.			509158	IN	NS	e.root-servers.net.
+.			509158	IN	NS	f.root-servers.net.
+.			509158	IN	NS	g.root-servers.net.
+.			509158	IN	NS	h.root-servers.net.
+.			509158	IN	NS	i.root-servers.net.
+.			509158	IN	NS	j.root-servers.net.
+.			509158	IN	NS	k.root-servers.net.
+.			509158	IN	NS	l.root-servers.net.
+.			509158	IN	NS	m.root-servers.net.
+.			509158	IN	RRSIG	NS 8 0 518400 20261124050000 20261111040000 8763 . NwvnXcW0EuY2REsQrcC+x/vAcNyg0S9tF7+HpgQFGB1GwuL+p+V4aSEp e7T9lM2bMbf9KRYQhSLUKJ0bHNWgN2b1gRxZPPUjj0wVw+HOFnNUf0GG 94ZhgPAv5hU51iEBJKD2XQtf3NrojY99z9+ICvAJ/V/Cf/GtEizsStLc WLKv+Ukxn6dZ5ZRFOar9YCwdvSLECPKkXJSi9v397Zu8YI2ASbtBOzei xdF/wVeO3dalT1JYOeHcqfWn/3stedBkkjYfERAXKYJqm5AR+WNhgt3N thtrRFqmgV2YjQdqvwKOVWL3sc1SqwA9vwXozik44+KV6z1wpi4Fe+On dFVBNQ==
+;; Received 525 bytes from 1.1.1.1#53(1.1.1.1) in 4 ms
+
+org.			172800	IN	NS	a2.org.afilias-nst.info.
+org.			172800	IN	NS	b2.org.afilias-nst.org.
+org.			172800	IN	NS	d0.org.afilias-nst.org.
+org.			172800	IN	NS	v0n0.pir-ns.org.
+org.			172800	IN	NS	v0n1.pir-ns.org.
+org.			172800	IN	NS	v0n2.pir-ns.org.
+org.			86400	IN	DS	725 8 2 EB3881030D9D34BB7BC40DDC5A198E7C830804C03FB6AA982592946D EB27BEBE
+org.			86400	IN	DS	26974 8 2 4FEDE294C53F438A158C41D39489CD78A86BEB0D8A0AEAFF14745C0D 16E1DE32
+org.			86400	IN	RRSIG	DS 8 1 86400 20261124170000 20261111160000 8763 . IQrcTMfc+gw1S5xp3xnWof3xdrDqCs0ZZCctuUeLkkw7d8FBQPqvcC08 HKgBVbv4phMW4E7lYkXa50LJbaIRMPw6Z1ejoUammAF420uX1yBuXZmC i7KZzE2+FBdxrH/NeaBAzBrUG4AbvqE6gIvsY6lS/rOYeQMdCwW3amG/ wi2jS7cNLYXqV8hNFGz1HRzs7s+URtPu3rPpBmMx34JlxJO3bowcRxQN DYKKJ3Sc6lXwRTJM0ZZnjfoD79QkVPSbbRd4syZCAS/6QNPsiEZRFgq3 tPusYK8LJqc/PlbQbkgdjQbFIV2NiNAPGr+xk5ZZuzvwoFEv0YBCoPAJ 7a3L7g==
+;; Received 844 bytes from 192.58.128.30#53(j.root-servers.net) in 0 ms
+
+debian.org.		3600	IN	NS	dns4.easydns.info.
+debian.org.		3600	IN	NS	nsp.dnsnode.net.
+debian.org.		3600	IN	NS	sec1.rcode0.net.
+debian.org.		3600	IN	NS	sec2.rcode0.net.
+debian.org.		3600	IN	DS	40756 8 2 BBE42151B1A41EFC1F7E6D74D86E601D55051D2B9EB99B1CD0CEAA6E 2A5618F5
+debian.org.		3600	IN	RRSIG	DS 8 2 3600 20261122000515 20261031223515 11859 org. SIHppxJmj7hc1ptW3zniL3koxD1d/AcmE5a4D9PRgRnmp9f06Io65fBP NjldNrYU5+L9HtuYzTrbFWQJS12q86fbL4tliSveYy91sHHeiJkUOKmo Bi2hf9m/kG64nv7w3e5rd4ns7N2/x54W3J3Pes2uc2SLSui+OUIZiwhF DpQ=
+;; Received 359 bytes from 199.19.57.1#53(d0.org.afilias-nst.org) in 8 ms
+
+www.debian.org.		28800	IN	NS	geo1.debian.org.
+www.debian.org.		28800	IN	NS	geo2.debian.org.
+www.debian.org.		28800	IN	NS	geo3.debian.org.
+www.debian.org.		28800	IN	DS	55475 13 2 EA7C6499117E2B2B68EA1FE903153ACB20D955C324A40C4B1A8CF8D7 B8E82C90
+www.debian.org.		28800	IN	RRSIG	DS 8 3 28800 20261218222924 20261109074031 29026 debian.org. gORUhQMOMdgEtusnTK1lV0FZkfcAEsyZ/d8yCPnIyzPs6fsknB6G9REC F4aTpY0fT+e9KHeyRdi8JI600ANVSJpX7v6rn71GtLxZhrxxnGOP5Hp4 nqb5obl01qiz2SB9gZgKlW43ULu+t6qdAvxemx83ROWBf9PmI17gVwIe zJkSpyxl/WAo2WOU9pn154pQ07I5MEDN1lII0l2Qnz0BB+hiUFs8jdnI +9Wssa+sLkzNUKUvfqIuJ71Qtj2jnTY0
+www.debian.org.		28800	IN	RRSIG	DS 13 3 28800 20261218222924 20261109074031 2461 debian.org. OVI+iONiLPmiBl4XH5/YqJXYGhKYLrjhi3w5mq11cDn/BMRh+U2njr6f YEmFxCabu/8GfQgB7iBKR8efVmXsbA==
+;; Received 960 bytes from 176.97.158.100#53(sec2.rcode0.net) in 4 ms
+
+www.debian.org.		300	IN	A	130.89.148.77
+www.debian.org.		300	IN	A	194.177.211.216
+www.debian.org.		300	IN	RRSIG	A 13 3 300 20261211171615 20261111171615 55475 www.debian.org. 8os2ylg2NcdzzQGu0hlQj8WbU/eo9XtwSazZw9dxc9tZERY9lpX9GqaA 7ZqUSBMIgwqNT1fluYypqqRkh51pTg==
+;; Received 213 bytes from 82.195.75.105#53(geo1.debian.org) in 16 ms
+
+
+3.1
+
