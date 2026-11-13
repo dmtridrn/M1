@@ -15,7 +15,6 @@ class Compte {
         Compte(int solde=0):solde(solde) {}
         Compte(const Compte& other) {
             std::lock_guard lock(other.mtx);
-            this->solde = other.solde;
         }
 
         void crediter (int val) {
