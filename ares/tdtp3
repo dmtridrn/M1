@@ -333,3 +333,128 @@ www.debian.org.		300	IN	RRSIG	A 13 3 300 20261211171615 20261111171615 55475 www
 
 3.1
 
+1) urveillance du réseau
+détection de pannes
+mesure de performance
+intervention sur le matériel
+activation (interface...)
+configuration (table de routage...)
+poste de contrôle centralisé
+
+2) 
+
++---------------------------------------------------------------------------------+
+|                       Station d'administration (Manager)                        |
+|  +---------------------------------------------------------------------------+  |
+|  | Base Centralisée : Historiques, statistiques, topologie, alarmes           |  |
+|  +---------------------------------------------------------------------------+  |
+|  | Processus de gestion (Management Process : NMS - ex. Nagios, OpenView)    |  |
+|  +---------------------------------------------------------------------------+  |
+|         |                       ^                     ^                         |
++---------|-----------------------|---------------------|-------------------------+
+          |                       |                     |
+     (1) get / get-next / set     | (2) get-response    | (3) trap
+          |                       |                     | (Port UDP 162)
+          v                       |                     |
+======================= Réseau de communication (UDP / IP) =======================
+          |                       |                     |
+          +-----------------------+                     |
+          |                                             |
+          v                                             |
++-------------------------------------------------------|-------------------------+
+|                  Équipement administré (Managed Node : Routeur, etc.)           |
+|  +------------------------------------+               |                         |
+|  | Registres matériels & OS           |               |                         |
+|  | (Compteurs d'octets, état liens)   |               |                         |
+|  +------------------^-----------------+               |                         |
+|                     | (couplage direct)               |                         |
+|  +------------------v-----------------+               |                         |
+|  | Agent d'administration (snmpd)     |<--------------+                         |
+|  | - Port d'écoute : UDP 161          |                                         |
+|  | - MIB locale (Base de variables)   |                                         |
+|  +------------------------------------+                                         |
++---------------------------------------------------------------------------------+
+
+3)
+
+Station d'administration (Management Station / NMS) : Machine centrale exploitée par l'administrateur, exécutant le logiciel de supervision (Management Process). Elle conserve une base de données centralisée regroupant l'historique des valeurs collectées, génère les requêtes d'interrogation/modification et reçoit les alertes.   
+Équipement administré (Managed Node) : Tout nœud physique ou logique présent sur le réseau disposant de ressources réseau à surveiller ou paramétrer (routeur, commutateur, serveur hôte, imprimante réseau, pont).   
+Agent d'administration : Logiciel démon (tel que snmpd) s'exécutant en tâche de fond sur l'équipement administré. Il fait l'interface entre le protocole de gestion et le système local : il lit ou écrit directement les registres matériels/système pour servir les requêtes reçues et peut détecter des conditions critiques pour générer des alertes spontanées.   
+Base d'information de gestion (MIB - Management Information Base) : Base de données conceptuelle et arborescente locale à l'agent, regroupant l'ensemble des variables et objets gérés (compteurs de paquets, tables de routage, états d'interfaces). La MIB standard d'Internet (MIB-II, RFC 1213) organise les objets par groupes fonctionnels (system, interfaces, ip, icmp, tcp, udp, etc.).   
+Structure des informations de gestion (SMI - Structure of Management Information) : Spécification formelle (ex. RFC 1155 / RFC 1212) qui fixe les règles syntaxiques de définition des objets de la MIB. Elle définit la notation de l'arborescence globale des identifiants d'objets (OID) et impose un sous-ensemble strict de types de données (types de base comme INTEGER, OCTET STRING, OBJECT IDENTIFIER, et types dérivés applicatifs comme Counter, Gauge, TimeTicks, IpAddress).   
+Protocole de gestion du réseau (SNMP - Simple Network Management Protocol) : Protocole applicatif définissant le format des messages (PDU), l'encodage (ASN.1 / BER) et les règles d'échange formelles entre les stations de supervision et les agents pour transporter les requêtes, modifications et alertes.
+
+4)
+type PDU : 0 (get), 1 (get-next), 2 (get-response),
+3 (set)
+Distinction entre requêtes/réponses (Polling synchrone) et envois spontanés (Traps asynchrones) :
+Requêtes / Réponses (get / get-next / set → get-response) :
+Fonctionnement : Dialogue synchrone initié à 100 % par la station d'administration. La station interroge l'agent (pull), et ce dernier répond immédiatement avec les données demandées.   
+ARes_C2_fr_4-2.pdf
++ 3
+Avantages : Fiabilité opérationnelle élevée. La station garde le contrôle complet du trafic d'administration injecté sur le réseau (pas de risque de tempête d'alertes) et peut constater elle-même l'inaccessibilité totale d'une machine si elle ne répond pas (détection de panne système complète).   
+ARes_C2_fr_4-2.pdf
++ 1
+Inconvénients : Introduit une latence intrinsèque dans la détection des incidents (l'administrateur n'apprend la panne qu'au prochain cycle de scrutation), et induit une consommation inutile de bande passante et de temps processeur pour rapatrier des compteurs dont la valeur n'a souvent pas changé.   
+ARes_C2_fr_4-2.pdf
++ 1
+Envois spontanés (trap) :
+Fonctionnement : Transmission asynchrone unilatérale initiée spontanément par l'agent (push) vers la station dès qu'un seuil ou un événement exceptionnel survient.   
+ARes_C2_fr_4-2.pdf
++ 1
+Avantages : Signalement instantané des anomalies (temps de réaction minimal) sans imposer une scrutation permanente à haute fréquence.   
+ARes_C2_fr_4-2.pdf
++ 1
+Inconvénients : Pas d'acquittement protocolaire au niveau applicatif en SNMPv1. Si le datagramme UDP est perdu en transit ou si le réseau s'écroule, la station ne reçoit jamais le message et ignore l'incident. De plus, lors d'un effondrement en cascade d'un pan du réseau, des centaines d'agents peuvent émettre des traps simultanément, générant une tempête de paquets (storm) qui achève de saturer les liaisons résiduelles.
+
+5)
+
+5. Raisons du choix d'UDP plutôt que TCP pour SNMP
+Robustesse et fonctionnement en situation de crise réseau :
+L'objectif fondamental d'un système d'administration est de permettre le diagnostic précisément lorsque le réseau subit une défaillance critique, des congestions sévères ou des pertes de paquets massives. Établir une connexion TCP exige un échange initial obligatoire en trois étapes (Handshake SYN, SYN-ACK, ACK). En cas de saturation d'une liaison, ce handshake échouera fréquemment par temporisation (timeout), empêchant toute communication. Un datagramme UDP est projeté sans négociation préalable et peut réussir à traverser un goulet d'étranglement.   
+ARes_C2_fr_4-2.pdf
+Faible empreinte mémoire et légèreté (Overhead minimal) :
+SNMP a été conçu pour administrer des périphériques matériels aux capacités matérielles et logicielles extrêmement limitées (hubs, ponts, cartes réseaux, capteurs, imprimantes dotées de microcontrôleurs modestes). Une pile TCP complète impose la gestion lourde de tampons de réception/émission, de numéros de séquence, d'algorithmes de fenêtrage glissant, de contrôle d'évitement de congestion et de temporisateurs de réémission, ce qui consomme une RAM et une puissance CPU prohibitives sur ces petits systèmes.   
+ARes_C2_fr_4-2.pdf
++ 1
+Format requête/réponse atomique et unitaire :
+Les échanges SNMP sont constitués de transactions simples et courtes : un datagramme de requête tient généralement dans quelques dizaines ou centaines d'octets et reçoit une réponse unique. Conserver une connexion TCP ouverte en permanence pour de simples requêtes épisodiques gaspillerait des descripteurs de sockets et des ressources de sessions sur l'agent.
+
+6)
+
+
+
+3.2.2
+Lecture d'un objet SNMP
+
+1) iso.3.6.1.2.1.1.5.0 = STRING: "server" qui correspond bien avec le hostname du docker
+2) iso.3.6.1.2.1.1.6.0 = STRING: "VM-ARES" et iso.3.6.1.2.1.1.4.0 = STRING: "administrateur@ares"
+3) -v2c indique à l'outil client d'utiliser la version 2c du protocole SNMP 
+(qui reprend la structure des messages de SNMPv1 avec quelques ajouts comme get-bulk, tout en conservant 
+l'authentification simple par communauté) 
+-c public c'est la communauté (public = ro private = w)
+
+Analyse d'un échange
+1) 1 seul paquet par action est nécessaire (un message client-server et un autre dans l'autre sens)
+2) UDP sur 161
+3) version 2c, public, get-request PDU et get-response PDU, 141805995, OID = 1.3.6.1.2.1.1.1.0, iso.3.6.1.2.1.1.1.0 = STRING: "Linux server 6.12.107+deb13-amd64 #1 SMP PREEMPT_DYNAMIC Debian 6.12.107-1 (2026-08-29) x86_64"
+4) le request id
+5) la valeur dans la requête est null car on connait ap encore, dans la réponse elle y est
+
+Opération GET-next
+1) On demande 4.0 (contact admin) et on reçoit 5.0 (server name) car on demande 
+le prochain objet dans l'arbre
+2) get next request
+
+Parcours MIB
+1) on fait une boucle de snmpget next
+3) sysName: paquet 10
+   sysLocation: 12
+   sysContact: 8
+
+Sécurité
+
+1) Oui
+2) Pas chiffré
+3) un tier non autorisé pourrait faire des modifications
+4) v3 
