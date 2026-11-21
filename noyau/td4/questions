@@ -1,0 +1,17 @@
+1)
+Matériel
+    Horlege temps réel maintenue par le bios
+    Composant horloge en parallèle du CPU avec sa fréquence:
+        RH--
+        if RH == 0 lever IT horloge => éxecution dans le système
+    tick = temps entre 2 IT horloges => fixé par un paramètre HZ
+
+Système 
+    Heure : recopiée depuis le BIOS, mise à jour par le système dans une variable global time nombre de seconde depuis 1er janvier 1970
+    temps cpu des processus (commande times) : nb de ticks consommé en mode u (u_utime), en mode s (u_stime).
+
+Ordonnancement et swapper
+    p_cpu (tick consommés), p_time (temps de résidence en mémoire) 
+
+2)
+mécanisme interne utilisé par les drivers pour exécuter une fonction dans le noyau (pas de signal) au de x tick

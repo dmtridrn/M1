@@ -1,0 +1,113 @@
+1
+
+1) DNS HTTP
+2) TCP pour HTTP et UDP pour DNS
+
+1.1
+1) pas de handshake, pas de logs d'états, chaque datagramme est indépendant, 
+2) pas de connection, pas fiable, message par message, léger et rapide
+3) échanges rapides, multicast/broadcast, efficacité legerté rapidité, + de contrôle
+4) Oui car on peut gérer ça sur la couche application, implémenter un système d'ACK et de correction d'erreur, de numérotation...
+
+
+1.2
+1) handshake, communication, fermeture, maintient d'état, 1-1, 
+2) checksum, ack, retransmission, temporisation, fenetre glissante
+3) Orienté connexion, Point-à-point, Bidirectionnel simultané, Flot d'octets continu, Service fiable et ordonné, 
+
+1.2.1
+1)  les flags
+2) Client (Hôte A)                              Serveur (Hôte B)
+      |                                            | (état LISTEN)
+      |--- 1. SYN (Seq = x) ---------------------->|
+      |                                            | (alloue tampons)
+      |<-- 2. SYN + ACK (Seq = y, Ack = x + 1) ----|
+      |                                            |
+      |--- 3. ACK (Seq = x + 1, Ack = y + 1) ----->| (peut contenir des données)
+      |                                            |
+      |=========== Connexion établie =============|
+    
+3) entre 0 et 2^32 -1, il s'incrémente pour chaque octet envoyé, non, oui (dans le 3way)
+4) éviter collisiosn avec anciennes connections, sécurité
+5) 
+
+1.2.2
+1) cumulatif (ACK(n) indique la bonne reception de toutes les données jusqua N, bien pour les débits normaux) et selectif (on ACK chaque 
+truc individuellement) TCP utilise cumul par défaut
+2) 
+Voici comment réagissent les deux politiques lorsqu'un paquet (disons le paquet 2) se perd en route alors que les paquets 0, 1, 2, 3, 4, 5 ont été envoyés :
+GOBACK N: Tout ce qui suit une perte est jeté et ré-émis
+    Côté Récepteur (pas de tampon de réordonnancement) :
+        Le récepteur ne retient qu'une seule variable : seqnum_attendu (le prochain numéro dans l'ordre).   
+        Il reçoit 0 (OK → envoie ACK 0), reçoit 1 (OK → envoie ACK 1).   
+        Le paquet 2 est perdu. Quand les paquets 3, 4 et 5 arrivent, ils sont dans le désordre (3 != 2) : le récepteur les jette purement et simplement 
+        (il n'a pas de mémoire tampon pour les garder de côté) et renvoie à chaque fois le dernier ACK valide en séquence (ACK 1).   
+    Côté Émetteur (une seule temporisation globale) :
+        L'émetteur n'a qu'un seul timer actif, associé au plus ancien paquet non acquitté (base, ici le paquet 2).   
+        Lorsque ce timer expire (tempo_2_expire), l'émetteur revient en arrière au paquet 2 et retransmet TOUTE la fenêtre à partir de 2 
+        (donc il ré-envoie 2, 3, 4 et 5, même si 3, 4, 5 étaient bien arrivés !).   
+    Bilan : Récepteur très simple (pas de buffer), mais gaspillage de bande passante si la fenêtre N est grande ou s'il y a beaucoup de pertes
+
+Selective Repeat: On garde ce qui arrive et on ne ré-émet que le trou
+    Côté Récepteur (avec tampon de réception et fenêtre propre) :
+        Le récepteur possède lui aussi une fenêtre de taille N et un tampon de réception.   
+        Lorsque le paquet 2 est perdu et que 3, 4, 5 arrivent dans le désordre, le récepteur les conserve en mémoire tampon et envoie un acquittement 
+        individuel pour chacun (ACK 3, ACK 4, ACK 5).   
+        Il ne peut pas encore les livrer à l'application (car il manque le 2 pour respecter l'ordre), donc sa fenêtre reste bloquée sur base_rcpt = 2
+    Côté Émetteur (un timer par paquet) :
+        Chaque paquet en transit possède sa propre temporisation individuelle.   
+        En recevant ACK 3, ACK 4, ACK 5, l'émetteur les marque comme "reçus" dans sa fenêtre.   
+        Quand le timer du paquet 2 expire (tempo_2_expire), l'émetteur retransmet uniquement le paquet 2.   
+        Dès que le récepteur reçoit le paquet 2 manquant, il livre d'un coup 2, 3, 4, 5 à l'application et fait glisser sa fenêtre jusqu'à 6.   
+    Bilan : Économie maximale de bande passante, mais gestion beaucoup plus complexe (un timer par paquet côté émetteur, tampon de 
+    réordonnancement côté récepteur).
+
+TCP hybride: 
+Comme Go-Back-N : 
+    TCP utilise des acquittements cumulatifs (via le champ Acknowledgment number) et un temporisateur unique associé 
+    au plus ancien octet non acquitté.   
+Comme les Retransmissions sélectives :
+    Le récepteur TCP possède un tampon de réception : il ne jette pas les segments reçus dans le désordre (il les stocke et envoie des ACK dupliqués).   
+    En cas de perte (détectée par 3 ACK dupliqués ou timeout), TCP ne retransmet que le segment manquant (et non toute la fenêtre comme un pur Go-Back-N), 
+    et si l'option SACK est activée, le récepteur peut même indiquer précisément les blocs déjà reçus dans le tampon.   
+
+
+1.2.3
+1) TCP déclenche un chronomètre (ou enregistre l'horodatage local) lors de l'envoi d'un segment non encore mesuré, et l'arrête dès qu'il 
+reçoit l'ACK qui acquitte les octets de ce segment.
+2)
+3) mémoire O(1) contre O(L) car on stocke rien a part le résultat jusque la 
+   calcul O(1) contre O(L) car on fait 2 calculs au lieu de faire la moyenne de L éléments
+4) si a = 1 alors RTT = RTTmesure
+  si a = 0 alors RTT = RTTancien
+5) ignorer la mesure provenant d'un segment retransmis, une mesure par fenetre aller retour, mesurer que les segments qui appellent un ACK
+6)
+
+
+2.1
+2) envoi sur le port 69
+3) En théorie pure, un seul champ (le port destination) suffirait pour un service minimaliste unidirectionnel, ou deux champs (ports source
+ et destination) pour un échange bidirectionnel. Les 8 octets d'UDP constituent donc le minimum pratique assurant l'intégrité bout-en-bout et 
+ l'alignement mémoire sur 32 bits
+
+4)
+
+
+3.3
+1) avec tcp on a tout, avec http on a que la requête et la réponse, avec tcp port = 80 on a tout et avec tcp len > 0 on a comme http
+2) client->serveur: SYN
+   serveur->client: SYN,ACK
+   client->serveur: ACK
+3)  client:41402
+    serveur: 80
+    les ports ne changent pas durant l'échange contrairement à TFTP
+4)  PUSH: livre immédiatement sans passer par un buffer 
+    FIN: Demande de mettre fin à la connexion
+5) oui ça marche
+7) non pas constante elle diminue au fur et a mesure que les données arrivent
+8) mss: max de charge utile par segment
+   windowscale: multiplicateur de la taille de la fenetre
+   SACK: selective ack: permet le réémission de paquets indépendamment des autres
+9) car ya 2 cannaux chacun doit fermer son canal de diffusion
+10) l'intégrité et l'ordre des données
+
