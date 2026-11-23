@@ -82,7 +82,7 @@ reçoit l'ACK qui acquitte les octets de ce segment.
   si a = 0 alors RTT = RTTancien
 5) ignorer la mesure provenant d'un segment retransmis, une mesure par fenetre aller retour, mesurer que les segments qui appellent un ACK
 6)
-
+aaa
 
 2.1
 2) envoi sur le port 69
