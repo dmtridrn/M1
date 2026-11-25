@@ -111,3 +111,26 @@ aaa
 9) car ya 2 cannaux chacun doit fermer son canal de diffusion
 10) l'intégrité et l'ordre des données
 
+3.4 JE SAIS PAS OU SONT LES TRACES PRÉ ENREGISTRÉES
+
+4.2
+
+1) 
+auth:
+(6)request USER etudiant -> (8)please specify password -> (10)request PASS:mmqos -> (12) login success
+ls:
+(34)request LIST -> (36) DATA (-rw-r--r--    1 0        0              32 Nov 25 13:18 bonjour\r\n)
+transfert:
+(43)request TYPE I (image/binary pour passer des fichiers) -> (45)request SIZE bonjour -> (46) 32 ->
+(52)request RETR bonjour -> (54) FTP datagramme
+terminaison: 67 - 69
+
+2) 
+Connexion de contrôle: 172.22.0.2:49844 -> 172.22.0.3:21
+Connexion pour le ls: .0.2:53054 -> .0.3:11922
+Connexion pour le transfert: .0.2:39968 -> .0.3:28450
+
+3) Passive mode, avec la request ESPV le serv lui répond par un numéro de port
+4)
+
+
